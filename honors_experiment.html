@@ -4,74 +4,137 @@
         <title>Reaction Time Exp Demo</title>
         <script src="jspsych-6.1.0/jspsych.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-vsl-grid-scene.js"></script> 
         <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script> 
         <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
-    <body></body>
+    <body style="background-color:lightgrey;">
+    	 
+    </body>
     <script>
 
         var timeline = [] 
 
         var welcome = {
             type: 'html-keyboard-response', 
-            stimulus: "Welcome you are an event planner and have been tasked with buying different items for your client's events.</p><p> Press any key to begin.</p>"
+            stimulus: "Welcome! Today you are an event planner and have been tasked with buying different items for your client's events.</p><p> Press any key to begin.</p>"
         };
         timeline.push(welcome);
 
-        var instructions = {
+        var instructions1 = {
             type: "html-keyboard-response",
-            stimulus: "<p>You will visit different stores your client has chosen. </p>Your job is to research the different items in the store based on reviews you will be shown and choose the best item to purchase for your client.</p><p> For each item, you will be shown either an aggregate star rating, or a written review." +
-                "<p>Press any key to begin.</p>"
+            stimulus: "<p>You will visit different stores your client has chosen. </p>Your job is to assess the different items in the stores. Based on </p><p>reviews of each item you should choose the best item to purchase for your client.</p><p>Press any key to continue</p>"
         };
-        timeline.push(instructions);
+        timeline.push(instructions1);
 
+        var instructions2 ={
+        	type: 'html-keyboard-response',
+        	stimulus: "For each item, you will be shown either an averaged star rating, or a written review." +
+        		"<p>Press any key to begin.</p>"
+        };
+        timeline.push(instructions2);
+        //show example trial for star and then for written review 
         var store_welcome = {
             type: 'html-keyboard-response',
             stimulus: "<p> You have arrived at store 1.</p>"+
                         "<p> Press any key to begin shopping.</p>"
         }
         timeline.push(store_welcome); 
+         
 
-        var store_items =[
-            {item: "stimuli/choice_items/cookie/cookie1.png", review: 'stimuli/stars/stars1.png'},
-            {item: "stimuli/choice_items/cookie/cookie2.png", review: 'stimuli/stars/stars2.png'},
-            {item: "stimuli/choice_items/cookie/cookie3.png", review: 'stimuli/stars/stars3.png'},
-            {item: "stimuli/choice_items/cookie/cookie4.png", review: 'stimuli/stars/stars4.png'},
-            {item: "stimuli/choice_items/cookie/cookie5.png", review: 'stimuli/stars/stars5.png'},
-        ];
+        //store_items 
+        //for loop for cookie images-- can make more dynamic for item type
+        function shuffle(list){
+            var random;
+            var temp;
+            for (var l = list.length - 1; l > 0; l--){
+                random = Math.floor(Math.random() * (l+1);
+                temp = list[l];
+                list[l] = list[random]; 
+                list[random] = temp;    
+            }
+            return list;
+        }
+
+        var items = shuffle([1, 2, 3, 4, 5, 6, 7, 8]);
+        var low_ratings = shuffle([1, 2, 3, 4, 5]);
+        var high_ratings = shuffle([6, 7, 8, 9, 10]);
+
+        var store_items = [];
+        var item; 
+        var review; 
+        var i; 
+
+        for (i = 0; i < 9; i++) { //i goes to number of items in store
+            item = items[i];
+            if (i % 2) {
+                review = low_ratings[i/2];
+            } else {
+                review = high_ratings[(i+1)/2];
+            }
+        	//certainty should also be balanced (4 highly certain and 4 low certain)
+        	store_items.push(
+        		{item: "stimuli/choice_items/cookie/cookie"+item+".png", 
+        		review: "stimuli/stars/stars"+review+".png",
+        		certainty: (Math.floor(Math.random() * 100) + 1)*10 + " Reviewers" }); 
+                //generate normally distributed random numbers (two gaussians, low (10S) mean and high (1000s) mean) -- maybe don't need word 'reviewers'
+        		
+        }
 
         var fixation = {
             type: 'html-keyboard-response',
             stimulus: '<div style="font-size:60px">+</div>',
             choices: jsPsych.NO_KEYS, 
-            trial_duration: function(){
-                return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500],1)[0];
-            },
+            trial_duration: function (){
+                return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750],1)[0];
+            }
         };
 
+        
         var store = {
             type: 'html-keyboard-response',
             stimulus: function(){
-                var html = "<img src ='"+jsPsych.timelineVariable('item', true)+"'>"; //width="225" height="225"
-                html += "<img src ='"+jsPsych.timelineVariable('review', true)+"' >"; //width="400" height="100"
+                var html = "<img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'cookies' style='width:250px;height:250px;' >"; 
+                html += "<img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'stars' style='width:450px;height:100px;'/>"; 
+                html += "<p style = 'font-size: 20pt;'> "+jsPsych.timelineVariable('certainty', true) + "</p>";
                 return html;
             },
-            choices: jsPsych.NO_KEYS,
-            trial_duration: 2500
+            choices: jsPsych.NO_KEYS, //think of cover task to require response so they pay attention (two text boxes to type # stars + reveiwers ?)
+            trial_duration: 4000
         };
 
-        var store_procedure = {
+
+        var store_procedure = { //browse_procedure
             timeline: [fixation, store],
             timeline_variables: store_items,
-            randomize_order: true 
+            randomize_order: true, 
+            repetitions: 3
         };
 
+        // var decision_prodecure ={
+        // 	timeline: [fixation, choice],
+        // 	//etc
+        // }
+
         timeline.push(store_procedure);
+        // timeline.push(decision_prodecure);
+
+        //store_procedure = {
+        	//timeline: [browse_procedure, decision_procedure],
+        	//timeline_variables: ??,
+        	//randomize_order: true,
+        	//repetitions: 8
+
+        timeline.push(store_procedure)
 
         //start experiment 
         jsPsych.init({
-            timeline: timeline
+            timeline: timeline,
+            // display_element: 'jspsych-target'
+            experiment_width: 500
         });
+
+        //tracking what store i'm on
 
     </script>
 </html>
