@@ -6,6 +6,10 @@
         <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-vsl-grid-scene.js"></script> 
         <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script> 
+        <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+   		<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
         <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
     <body style="background-color:lightgrey;">
@@ -13,73 +17,227 @@
     </body>
     <script>
 
+        /* Add subject level parameters to the data */
+        var turkInfo = jsPsych.turk.turkInfo();
+        var code = Math.floor(Math.random()*90000) + 10000;
+        date = + new Date()
+        jsPsych.data.addProperties({
+            subject_id: code, //unique code for each participant
+            date: date, // current date
+        });
+
         var timeline = [] 
 
-        var welcome = {
-            type: 'html-keyboard-response', 
-            stimulus: "Welcome! Today you are an event planner and have been tasked with buying different items for your client's events.</p><p> Press any key to begin.</p>"
-        };
-        timeline.push(welcome);
+        timeline.push({
+          type: 'fullscreen',
+          fullscreen_mode: true
+        });
 
-        var instructions1 = {
-            type: "html-keyboard-response",
-            stimulus: "<p>You will visit different stores your client has chosen. </p>Your job is to assess the different items in the stores. Based on </p><p>reviews of each item you should choose the best item to purchase for your client.</p><p>Press any key to continue</p>"
+        var survey_trial = {
+          type: 'survey-text',
+          questions: [{prompt: "How old are you?"}]
         };
-        timeline.push(instructions1);
+       // timeline.push(survey_trial);
 
-        var instructions2 ={
-        	type: 'html-keyboard-response',
-        	stimulus: "For each item, you will be shown either an averaged star rating, or a written review." +
-        		"<p>Press any key to begin.</p>"
+        var multi_select_block = {
+            type: 'survey-multi-choice',
+            questions: [{prompt: "What is your gender?", options: ["Male","Female","Other"]}]
         };
-        timeline.push(instructions2);
-        //show example trial for star and then for written review 
-        var store_welcome = {
-            type: 'html-keyboard-response',
-            stimulus: "<p> You have arrived at store 1.</p>"+
-                        "<p> Press any key to begin shopping.</p>"
+       // timeline.push(multi_select_block);
+
+        /* Provide instructions to the participant */
+        var instructions = {
+            type: 'instructions',
+            pages: [
+                "<div><img src='stimuli/instructions/instruction1.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction2.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction3.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction4.png' style='width:1000px;height:600px'></img></div>"
+            ],
+            key_forward:'i',
+            key_backward:'u',
         }
-        timeline.push(store_welcome); 
-         
+        timeline.push(instructions);
 
-        //store_items 
-        //for loop for cookie images-- can make more dynamic for item type
-        function shuffle(list){
+        /* If they fail the comprehension check, tell them */
+        var repeat_screen = {
+            type: 'instructions',
+            pages: [
+                "Sorry, you missed one or more questions.</br></br>"+
+                "Please press the 'i' key to repeat the instructions."
+            ],
+            key_forward:'i'
+        }
+
+        var comprehension_check = {
+            type: 'survey-multi-choice',
+            questions: [{prompt: "Individual choices in this experiment are between:",
+                         options: ['2 items in the same store','2 items in different stores','2 different stores']},
+                        {prompt: "You need to use the rating and reviewers to learn about the items in each store",
+                         options: ["True","False"]},
+                        {prompt: "After browsing the items of a store, you will:",
+                         options: ["Move on to another store","Make purchases between two items of that store","Talk to your client"]},
+                        {prompt: "How many stores will you be visiting today?",
+                         options: ["8","10","12"]},
+                        {prompt: "During each offer, how many items are you choosing between?",
+                         options: ["2","4","6"]},
+                        {prompt: "Which key should you use to respond to an item on the left side?",
+                         options: ["j","k"]}],
+            on_finish: function(data) {
+                var responses = JSON.parse(data.responses);
+                var repeat_instructions = false;
+                if (responses["Q0"] != "2 items in the same store") {
+                    repeat_instructions = true;
+                } else if (responses["Q1"] != "True") {
+                    repeat_instructions = true;
+                } else if (responses["Q2"] != "Make purchases between two items of that store") {
+                    repeat_instructions = true;
+                } else if (responses["Q3"] != "10") {
+                    repeat_instructions = true;
+                } else if (responses["Q4"] != "2") {
+                    repeat_instructions = true;
+                } else if (responses["Q5"] != "j") {
+                    repeat_instructions = true;
+                }
+                if (repeat_instructions) {
+                    var new_timeline = {
+                          timeline: [repeat_screen,
+                                     instructions,
+                                     comprehension_check]
+                    }
+                } else {
+                    var new_timeline = {
+                          timeline: ''
+                    }
+                	var multi_store = []
+        	        for(let i = 0; i < store_type.length; i++){
+	        			var welcome_procedure = {
+				        timeline: [store_welcome],
+				        timeline_variables: '',
+				        randomize_order: true,
+				        repetitions: 1 
+				        };
+
+				        var browse_procedure = { 
+				        timeline: [fixation, browse],
+				        timeline_variables: '', 
+				        randomize_order: true, 
+				        repetitions: 3
+				        };
+
+				        var choice_procedure = {
+				        timeline: [fixation, choice],
+				        timeline_variables: '',
+				        randomize_order: true,
+				        repetitions: 5 
+				        };
+
+				        var store_procedure = {
+				        timeline: [], 
+				        timeline_variables: trial_stimuli, 
+				        randomize_order: true, 
+				        repetitions: 1  
+				        };
+		                welcome_procedure['timeline_variables'] = [all_stores[store_type[i]][0]]
+		                browse_procedure['timeline_variables'] =  all_stores[store_type[i]]
+		                choice_procedure['timeline_variables'] = [all_stores[store_type[i]][0]]
+		                store_procedure['timeline'] = [welcome_procedure, browse_procedure, choice_intro, choice_procedure] 
+		                multi_store.push(store_procedure)
+			        }
+			        multi_store.push(debrief_block);
+			        new_timeline['timeline'] = multi_store;
+
+                }
+                jsPsych.pauseExperiment();
+                jsPsych.addNodeToEndOfTimeline(new_timeline, jsPsych.resumeExperiment)
+
+            }
+        };
+        timeline.push(comprehension_check);
+        
+        //shuffle function to use later
+        function shuffle(order){
             var random;
             var temp;
-            for (var l = list.length - 1; l > 0; l--){
-                random = Math.floor(Math.random() * (l+1);
-                temp = list[l];
-                list[l] = list[random]; 
-                list[random] = temp;    
+            for (var l = order.length - 1; l > 0; l--){
+                random = Math.floor(Math.random() * (l+1));
+                temp = order[l];
+                order[l] = order[random]; 
+                order[random] = temp;    
             }
-            return list;
+            return order;
         }
 
-        var items = shuffle([1, 2, 3, 4, 5, 6, 7, 8]);
-        var low_ratings = shuffle([1, 2, 3, 4, 5]);
-        var high_ratings = shuffle([6, 7, 8, 9, 10]);
+        var items = [1, 2, 3, 4, 5, 6, 7, 8];
+        var low_ratings = [1, 2, 3, 4, 5];
+        var high_ratings = [6, 7, 8, 9, 10];
+        var store_type = ['cookie', 'basket', 'bowl', 'cr', 'donut', 'gift', 'ornament', 'sandwich', 'lei', 'goggle'];
+        var trial_number = 0;
+        var all_stores = {}; 
 
-        var store_items = [];
-        var item; 
-        var review; 
-        var i; 
+		shuffle(items);
+		shuffle(low_ratings);
+		shuffle(high_ratings);
+		shuffle(store_type);
 
-        for (i = 0; i < 9; i++) { //i goes to number of items in store
-            item = items[i];
-            if (i % 2) {
-                review = low_ratings[i/2];
-            } else {
-                review = high_ratings[(i+1)/2];
-            }
-        	//certainty should also be balanced (4 highly certain and 4 low certain)
-        	store_items.push(
-        		{item: "stimuli/choice_items/cookie/cookie"+item+".png", 
-        		review: "stimuli/stars/stars"+review+".png",
-        		certainty: (Math.floor(Math.random() * 100) + 1)*10 + " Reviewers" }); 
-                //generate normally distributed random numbers (two gaussians, low (10S) mean and high (1000s) mean) -- maybe don't need word 'reviewers'
-        		
-        }
+		for (var j = 0; j < store_type.length; j++){
+			var store_items = [];
+			var store = store_type[j];
+	        for (var i = 0; i < 8; i++) { //i goes to number of items in store
+				var v = '';
+				var c = 'l';
+	            var product = items[i];
+                var max = 250;
+        		var min = 50;
+	            if (i > 3){
+	            	max = 1100;
+	            	min = 900;
+	            	c = 'h'; 
+	            } 
+	            var rating;
+	            if (i == 0){
+	                rating = low_ratings[0];
+	                v = 'l';
+	            } else if (i % 2 == 0) {
+	                rating = low_ratings[(i/2)];
+	                v = 'l';
+	            } else {
+	                rating = high_ratings[(i+1)/2];
+	                v = 'h'; 
+	            }
+	            var vc = v + c;
+	        	store_items.push(
+	        		{item: "stimuli/choice_items/"+store+"/"+store+product+".png", 
+	        		review: "stimuli/stars/stars"+rating+".png",
+	        		certainty: Math.floor(Math.random() * (max-min+1) + min) + " Reviewers",
+                    type: vc  }); 	        		
+		    }
+		    all_stores[store] = store_items; 
+		}
+        //valence, certainty _v_ valence, certainty (ll, hl, lh, hh)
+        var stim_list = [   'll_v_ll', 
+                            'lh_v_ll',
+                            'hl_v_ll',
+                            'hh_v_ll',
+                            'lh_v_lh', 
+                            'hl_v_lh',
+                            'hh_v_lh',
+                            'hl_v_hl',
+                            'hl_v_hh',
+                            'hh_v_hh'
+                         ]
+        var stim_tracker = { 
+                            'll_v_ll': 0, //expect chance
+                            'lh_v_ll': 0,
+                            'hl_v_ll': 0,
+                            'hh_v_ll': 0,
+                            'lh_v_lh': 0, //expect chance
+                            'hl_v_lh': 0,
+                            'hh_v_lh': 0,
+                            'hl_v_hl': 0, //expect chance
+                            'hl_v_hh': 0,
+                            'hh_v_hh': 0 //expect chance
+                            }
 
         var fixation = {
             type: 'html-keyboard-response',
@@ -90,12 +248,30 @@
             }
         };
 
+        /* Initializing a dummy list of stimuli to present
+           JsPsych wants this for some reason  */
+        var trial_stimuli = [{stimulus:"",data:{}}];
+
+        var store_welcome = {
+        	type: 'html-keyboard-response',
+        	//change this to be specific for each store
+        	stimulus: function(){
+    		    var random_item = jsPsych.timelineVariable('item', true);
+                var list = random_item.split('/');
+                var current_store = list[2];
+                var welcome_img = "stimuli/store_welcomes/"+current_store+"_intro.png"
+                var html = "<p><img src ='"+welcome_img+"' alt = 'item'></p>"; 
+
+                return html;
+            },
+         	choices: [13]
+        };
         
-        var store = {
+        var browse = {
             type: 'html-keyboard-response',
             stimulus: function(){
-                var html = "<img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'cookies' style='width:250px;height:250px;' >"; 
-                html += "<img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'stars' style='width:450px;height:100px;'/>"; 
+                var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
+                html += "<p><img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'review' style='width:450px;height:100px;'/></p>"; 
                 html += "<p style = 'font-size: 20pt;'> "+jsPsych.timelineVariable('certainty', true) + "</p>";
                 return html;
             },
@@ -103,38 +279,201 @@
             trial_duration: 4000
         };
 
+        var choice_intro = {
+        	type: 'html-keyboard-response',
+        	stimulus: "<p>Thank you for browsing our store, now it is time to shop!</p>" +
+        				"<p> To shop, you will be offered  two items that you saw while browsing. It is your job to choose which of the two items to buy. </p>" +
+        				"<p> Select the 'j' key to purchase the item on the left, and the 'k' key to purchase the item on the right.</p>" +
+        				"<p> You will have 4 seconds to choose your item. The store will move on to a new offer if you do not make a choice. </p>" +
+        				"<p> Please make a selection after each offer. </p>" +
+        				"<p> Press enter to begin shopping </p>",
 
-        var store_procedure = { //browse_procedure
-            timeline: [fixation, store],
-            timeline_variables: store_items,
-            randomize_order: true, 
-            repetitions: 3
+        }
+
+        var choice = {
+        	type: 'html-keyboard-response',
+        	stimulus: "",
+            choices: ['j', 'k'],
+            trial_duration: 4000,
+            response_ends_trial: true,
+            data: jsPsych.timelineVariable('data'),
+            on_start: function(choice){
+                trial_number += 1; 
+
+                choice.data.phase = 'choice';
+                choice.data.trial_number = trial_number;
+                choice.data.trial_type_num = 'none';
+                choice.data.store_type = 'none';
+                choice.data.choice_type = 'none';
+                choice.data.img_left = 'none';
+                choice.data.img_left_rating = 'none';
+                choice.data.img_left_certainty = 'none';
+                choice.data.img_left_type = 'none'; 
+                choice.data.img_right = 'none'; 
+                choice.data.img_right_rating = 'none';
+                choice.data.img_right_certainty = 'none';
+                choice.data.img_right_type = 'none';
+                choice.data.chosen = 'none';
+                choice.data.choice_rating = 'none';
+                choice.data.choice_certainty = 'none';
+                choice.data.chosen_type = 'none';
+                choice.data.side_chosen = 'none';
+                //choice.data.correct = false;
+
+                //pull from choice type that has not been shown 5 times and sample randomly
+                var valid_stim = [];
+                for (let k = 0; k < stim_list.length; k++){
+                    if (stim_tracker[stim_list[k]] < 5){
+                        valid_stim.push(stim_list[k]);
+                	}
+                }
+
+                var trial_type = shuffle(valid_stim).pop();
+                var value_types = trial_type.split('_v_');
+
+                //get current store
+                var random_item = jsPsych.timelineVariable('item', true);
+                var list = random_item.split('/')
+                current_store = list[2];
+
+                //get list of ellible items from the given store for the chosen choice type
+                var valid_items1 = [];
+                var valid_items2 = [];
+                if (value_types[0] == value_types[1]){
+                	var alternate = false;
+                	for (let k = 0; k < all_stores[current_store].length; k++){
+                		if  (alternate == false) {
+                            if(value_types[0] === all_stores[current_store][k]['type']){
+                                valid_items1.push(all_stores[current_store][k]);
+                                alternate = true;
+                            }
+            			} else {
+                            if(value_types[1] === all_stores[current_store][k]['type']){
+                                valid_items2.push(all_stores[current_store][k]);
+                                alternate = false;
+                            }
+                		}
+                	}
+                } else {                
+                	for (let k = 0; k < all_stores[current_store].length; k++){
+	                    for (let j = 0; j < value_types.length; j++){
+	                        if (j == 0){
+	                            if(value_types[j] === all_stores[current_store][k]['type']){
+	                                valid_items1.push(all_stores[current_store][k]);
+	                            }
+	                        } else {
+	                        	//if not in validitems1...
+	                            if(value_types[j] === all_stores[current_store][k]['type']){
+	                                valid_items2.push(all_stores[current_store][k]);
+	                            }
+	                        }
+	                    }                   
+	                }
+	            }
+                
+                var img_left;
+                var img_right;
+                var random_assignment = Math.floor(Math.random() * 10) + 1;
+                if (random_assignment % 2 == 0){
+                    img_left = shuffle(valid_items1).pop();
+                    img_right = shuffle(valid_items2).pop();
+                } else {
+                    img_left = shuffle(valid_items2).pop();
+                    img_right = shuffle(valid_items1).pop();
+                }
+       
+                choice.stimulus = "<div style='width: 1000px;'>"+
+                "<div style='float: left;'><img src='"+img_left['item']+"' style='width:250px;height:250px'></img></div>" +
+                "<div style='float: right;'><img src='"+img_right['item']+"' style='width:250px;height:250px'></img></div>" +
+                "</div>";
+
+                stim_tracker[trial_type] = stim_tracker[trial_type] + 1; 
+
+                //store data
+                var left_list = img_left['item'].split('/');
+                var right_list = img_right['item'].split('/')
+                choice.data.phase = 'choice';
+                choice.data.trial_type_num = stim_tracker[trial_type];
+                choice.data.store_type = current_store;
+                choice.data.choice_type = trial_type;
+                choice.data.img_left = left_list[3].replace('.png', '');
+                choice.data.img_left_rating = img_left['review'].replace(/[^0-9]/g, '');
+                choice.data.img_left_certainty = img_left['certainty'].replace(/[^0-9]/g, '');
+                choice.data.img_left_type = img_left['type'];
+                choice.data.img_right = right_list[3].replace('.png', '');
+                choice.data.img_right_rating = img_right['review'].replace(/[^0-9]/g, '');
+                choice.data.img_right_certainty = img_right['certainty'].replace(/[^0-9]/g, '');
+                choice.data.img_right_type = img_right['type'];
+
+
+            },
+            on_finish: function(data) {
+
+                j_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('j');
+                k_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('k');
+
+            //save images, values, uncertainty, (be able to reconstruct trial), rt)
+                if (data.key_press == j_code) {
+                    data.chosen = data.img_left;
+                    data.choice_rating = data.img_left_rating;
+                    data.choice_certainty = data.img_left_certainty;
+                    data.chosen_type = data.img_left_type;
+                    data.side_chosen = 'left'
+                } else if (data.key_press == k_code) {
+                    data.chosen = data.img_right;
+                    data.choice_rating = data.img_right_rating;
+                    data.choice_certainty = data.img_right_certainty;
+                    data.chosen_type = data.img_right_type;
+                    data.side_chosen = 'right'
+                } else {
+                    data.choice = 'no_response';
+                }
+        	}
         };
 
-        // var decision_prodecure ={
-        // 	timeline: [fixation, choice],
-        // 	//etc
-        // }
+        var debrief_block = {
+            type: "html-keyboard-response",
+            choices: jsPsych.NO_KEYS,
+            stimulus: function() {
 
-        timeline.push(store_procedure);
-        // timeline.push(decision_prodecure);
+		        // This function will locally download data
+		        // Comment out for actual task, uncomment for local testing (without PHP)
+		        function saveData(name, data){
+		           var a         = document.createElement('a');
+		           a.href        = 'data:attachment/csv,' +  encodeURIComponent(data);
+		           a.target      = '_blank';
+		           a.download    = name;
+		           document.body.appendChild(a);
+		           a.click();
+		        }
+		        saveData(code+"_"+date+"_experiment_data.csv", jsPsych.data.get().csv())
+		        saveData(code+"_"+date+"_interaction_data.csv", jsPsych.data.getInteractionData().csv())
 
-        //store_procedure = {
-        	//timeline: [browse_procedure, decision_procedure],
-        	//timeline_variables: ??,
-        	//randomize_order: true,
-        	//repetitions: 8
+                // // Save data
+                // function saveData(name, data){
+                //      var xhr = new XMLHttpRequest();
+                //      xhr.open('POST', 'write_data.php');
+                //      xhr.setRequestHeader('Content-Type', 'application/json');
+                //      xhr.send(JSON.stringify({filename: name, filedata: data}));
+                // }
 
-        timeline.push(store_procedure)
+                // saveData(code+"_"+date+"_"+"bonus"+total_earnings+"_experiment_data.csv", jsPsych.data.get().csv())
+                // saveData(code+"_"+date+"_"+"bonus"+total_earnings+"_interaction_data.csv", jsPsych.data.getInteractionData().csv())
+
+                return "You have completed the experiment. Thank you for participating!"+
+                       "<b>Your survey code is: "+code+"</b>"+
+                       "<p>In order to receive payment, you must provide the above code on the survey link page on mturk.</p>"+
+                       "<p> You may exit fullscreen now.</p>"
+
+            }
+        };
 
         //start experiment 
         jsPsych.init({
             timeline: timeline,
-            // display_element: 'jspsych-target'
-            experiment_width: 500
+            experiment_width: 1000
         });
 
-        //tracking what store i'm on
 
     </script>
 </html>
