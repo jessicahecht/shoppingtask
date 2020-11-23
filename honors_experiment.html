@@ -37,13 +37,13 @@
           type: 'survey-text',
           questions: [{prompt: "How old are you?"}]
         };
-       timeline.push(survey_trial);
+       // timeline.push(survey_trial);
 
         var multi_select_block = {
             type: 'survey-multi-choice',
             questions: [{prompt: "What is your gender?", options: ["Male","Female","Other"]}]
         };
-       timeline.push(multi_select_block);
+       // timeline.push(multi_select_block);
 
         /* Provide instructions to the participant */
         var instructions = {
@@ -52,7 +52,8 @@
                 "<div><img src='stimuli/instructions/instruction1.png' style='width:1000px;height:600px'></img></div>",
                 "<div><img src='stimuli/instructions/instruction2.png' style='width:1000px;height:600px'></img></div>",
                 "<div><img src='stimuli/instructions/instruction3.png' style='width:1000px;height:600px'></img></div>",
-                "<div><img src='stimuli/instructions/instruction4.png' style='width:1000px;height:600px'></img></div>"
+                "<div><img src='stimuli/instructions/instruction4.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction5.png' style='width:1000px;height:600px'></img></div>"
             ],
             key_forward:'i',
             key_backward:'u',
@@ -71,7 +72,9 @@
 
         var comprehension_check = {
             type: 'survey-multi-choice',
-            questions: [{prompt: "Individual choices in this experiment are between:",
+            questions: [{prompt: "How many items are there in each store?",
+            			 options: ['4', '8', '16']},
+            			 {prompt: "Offers in this experiment are between:",
                          options: ['2 items in the same store','2 items in different stores','2 different stores']},
                         {prompt: "You need to use the rating and reviewers to learn about the items in each store",
                          options: ["True","False"]},
@@ -82,22 +85,28 @@
                         {prompt: "During each offer, how many items are you choosing between?",
                          options: ["2","4","6"]},
                         {prompt: "Which key should you use to respond to an item on the left side?",
-                         options: ["j","k"]}],
+                         options: ["j","k"]},
+                         prompt: "While browsing, how many times will you be shown each item in a store?",
+                         options: ['1', '2', '3']],
             on_finish: function(data) {
                 var responses = JSON.parse(data.responses);
                 var repeat_instructions = false;
-                if (responses["Q0"] != "2 items in the same store") {
+                if (responses["Q0"] != "8"){
+                	repeat_instructions = true;
+                } else if (responses["Q1"] != "2 items in the same store") {
                     repeat_instructions = true;
-                } else if (responses["Q1"] != "True") {
+                } else if (responses["Q2"] != "True") {
                     repeat_instructions = true;
-                } else if (responses["Q2"] != "Make purchases between two items of that store") {
+                } else if (responses["Q3"] != "Make purchases between two items of that store") {
                     repeat_instructions = true;
-                } else if (responses["Q3"] != "10") {
+                } else if (responses["Q4"] != "10") {
                     repeat_instructions = true;
-                } else if (responses["Q4"] != "2") {
+                } else if (responses["Q5"] != "2") {
                     repeat_instructions = true;
-                } else if (responses["Q5"] != "j") {
+                } else if (responses["Q6"] != "j") {
                     repeat_instructions = true;
+                } else if (responses["Q7"] != "3"){
+                	repeat_instructions = true;
                 }
                 if (repeat_instructions) {
                     var new_timeline = {
