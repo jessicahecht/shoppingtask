@@ -8,7 +8,7 @@
         <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script> 
         <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
-   	<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+   		<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
@@ -88,8 +88,8 @@
             			 options: ['4', '8', '16']},
             			 {prompt: "Offers in this experiment are between:",
                          options: ['2 items in the same store','2 items in different stores','2 different stores']},
-                        {prompt: "You need to use the rating and reviewers to learn about the items in each store",
-                         options: ["True","False"]},
+                        {prompt: "How should you determine which item is best to purchase for your client?",
+                         options: ["If you like it the best","Based the star rating", "Based on the star rating and number of reviewers that contributed to the rating"]},
                         {prompt: "When browsing an item of a store, you will be asked to:",
                          options: ["Type the star rating","Type the number of reviewers","Both"]},
                         {prompt: "How many stores will you be visiting today?",
@@ -100,7 +100,7 @@
                          options: ["j","k"]},
                         {prompt: "When purchasing items from the offers, you are not allowed to purchase the same item twice.",
                     	 options: ['true', 'false']},
-                        {prompt: "While browsing, how many times will you be shown each item's sequence in a store?",
+                        {prompt: "While browsing, how many times will you be shown each item's rating sequence in a store?",
                          options: ['1', '2', '3']},
                         {prompt: "How much time will you have to select an item to purchase from an offer?",
                      	 options: ['2 seconds', '3 seconds', '4 seconds']}],
@@ -111,7 +111,7 @@
                 	repeat_instructions = true;
                 } else if (responses["Q1"] != "2 items in the same store") {
                     repeat_instructions = true;
-                } else if (responses["Q2"] != "True") {
+                } else if (responses["Q2"] != "Based on the star rating and number of reviewers that contributed to the rating") {
                     repeat_instructions = true;
                 } else if (responses["Q3"] != "Both") {
                     repeat_instructions = true;
