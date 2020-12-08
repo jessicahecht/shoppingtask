@@ -8,9 +8,10 @@
         <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script> 
         <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
-   		<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+   	<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
         <script src="jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
         <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
     <body style="background-color:lightgrey;">
@@ -38,13 +39,13 @@
           type: 'survey-text',
           questions: [{prompt: "How old are you?"}]
         };
-       timeline.push(survey_trial);
+        timeline.push(survey_trial);
 
         var multi_select_block = {
             type: 'survey-multi-choice',
             questions: [{prompt: "What is your gender?", options: ["Male","Female","Other"]}]
         };
-       timeline.push(multi_select_block);
+        timeline.push(multi_select_block);
 
         /* Provide instructions to the participant */
         var instructions = {
@@ -61,7 +62,9 @@
                 "<div><img src='stimuli/instructions/instruction9.png' style='width:1000px;height:600px'></img></div>",
                 "<div><img src='stimuli/instructions/instruction10.png' style='width:1000px;height:600px'></img></div>",
                 "<div><img src='stimuli/instructions/instruction11.png' style='width:1000px;height:600px'></img></div>",
-                "<div><img src='stimuli/instructions/instruction12.png' style='width:1000px;height:600px'></img></div>"
+                "<div><img src='stimuli/instructions/instruction12.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction13.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions/instruction14.png' style='width:1000px;height:600px'></img></div>"
             ],
             key_forward:'i',
             key_backward:'u',
@@ -87,16 +90,20 @@
                          options: ['2 items in the same store','2 items in different stores','2 different stores']},
                         {prompt: "You need to use the rating and reviewers to learn about the items in each store",
                          options: ["True","False"]},
-                        {prompt: "When browsing an item of a store, you will:",
+                        {prompt: "When browsing an item of a store, you will be asked to:",
                          options: ["Type the star rating","Type the number of reviewers","Both"]},
                         {prompt: "How many stores will you be visiting today?",
                          options: ["8","10","12"]},
-                        {prompt: "During each offer, how many items are you choosing between?",
-                         options: ["2","4","6"]},
-                        {prompt: "Which key should you use to respond to an item on the left side?",
+                        {prompt: "How many offers will be made for each store?",
+                         options: ["1","5","10"]},
+                        {prompt: "Which key should you use to choose the item offered on the left side?",
                          options: ["j","k"]},
-                         {prompt: "While browsing, how many times will you be shown each item in a store?",
-                         options: ['1', '2', '3']}],
+                        {prompt: "When purchasing items from the offers, you are not allowed to purchase the same item twice.",
+                    	 options: ['true', 'false']},
+                        {prompt: "While browsing, how many times will you be shown each item's sequence in a store?",
+                         options: ['1', '2', '3']},
+                        {prompt: "How much time will you have to select an item to purchase from an offer?",
+                     	 options: ['2 seconds', '3 seconds', '4 seconds']}],
             on_finish: function(data) {
                 var responses = JSON.parse(data.responses);
                 var repeat_instructions = false;
@@ -110,11 +117,15 @@
                     repeat_instructions = true;
                 } else if (responses["Q4"] != "10") {
                     repeat_instructions = true;
-                } else if (responses["Q5"] != "2") {
+                } else if (responses["Q5"] != "5") {
                     repeat_instructions = true;
                 } else if (responses["Q6"] != "j") {
                     repeat_instructions = true;
-                } else if (responses["Q7"] != "2"){
+                } else if (responses["Q7"] != "false"){
+                	repeat_instructions = true;
+                } else if (responses["Q8"] != "2"){
+                	repeat_instructions = true;
+                }  else if (responses["Q9"] != "4 seconds"){
                 	repeat_instructions = true;
                 }
                 if (repeat_instructions) {
@@ -138,7 +149,7 @@
 
 				        var browse_procedure = { 
 				        //timeline: [fixation, browse], //[fixation, star_stim, star_input, review_stim, review_input]
-				        timeline: [fixation, star_stim, star_input, fixation,review_stim, review_input], //star_input,
+				        timeline: [fixation, star_stim, star_input, review_stim, review_input], //star_input,
 				        timeline_variables: '', 
 				        randomize_order: true, 
 				        repetitions: 2
@@ -206,11 +217,11 @@
 				var v = '';
 				var c = 'l';
 	            var product = items[i];
-                var max = 250;
-        		var min = 50;
+                var max = 18;
+        		var min = 2;
 	            if (i > 3){
-	            	max = 1100;
-	            	min = 900;
+	            	max = 108;
+	            	min = 92;
 	            	c = 'h'; 
 	            } 
 	            var rating;
@@ -554,6 +565,31 @@
             }
         };
 
+        //add questions
+        /*
+        1. how did you decide which item was best
+        2. how confident are you that you chose the best items
+        */
+
+        var post_task_question1 = {
+          type: 'survey-text',
+          questions: [{prompt: "In a few words, please describe how you chose which item was best when presented with an offer?"}]
+        };
+        timeline.push(post_task_question1);
+
+        var post_task_question2 = {
+        	type: 'survey-likert',
+        	questions: [
+        	{prompt: "How confident are you that you consistently chose the best item for your client?", 
+        	labels: ['Not Confident', 'Somewhat Confident', 'Neutral', 'Mostly Confident', 'Very Confident']},
+        	{prompt: "How much did you use the star ratings in choosing the best items?",
+        	labels: ['Never', 'Almost Never', 'Sometimes', 'Almost Always', 'Always']},
+        	{prompt: "How much did you use the number of reviewers in choosing the best items?",
+        	labels: ['Never', 'Almost Never', 'Sometimes', 'Almost Always', 'Always']},
+        	
+        	]
+        }
+        timeline.push(post_task_question2);
         //start experiment 
         jsPsych.init({
             timeline: timeline,
