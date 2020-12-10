@@ -148,8 +148,7 @@
 				        };
 
 				        var browse_procedure = { 
-				        //timeline: [fixation, browse], //[fixation, star_stim, star_input, review_stim, review_input]
-				        timeline: [fixation, star_stim, star_input, review_stim, review_input], //star_input,
+				        timeline: [fixation, star_stim, star_input, review_stim, review_input], 
 				        timeline_variables: '', 
 				        randomize_order: true, 
 				        repetitions: 2
@@ -168,12 +167,15 @@
 				        randomize_order: true, 
 				        repetitions: 1  
 				        };
+
 		                welcome_procedure['timeline_variables'] = [all_stores[store_type[i]][0]]
 		                browse_procedure['timeline_variables'] =  all_stores[store_type[i]]
 		                choice_procedure['timeline_variables'] = [all_stores[store_type[i]][0]]
 		                store_procedure['timeline'] = [welcome_procedure, browse_procedure, choice_intro, choice_procedure] 
 		                multi_store.push(store_procedure)
 			        }
+			        multi_store.push(post_task_question1);
+			        multi_store.push(post_task_question2);
 			        multi_store.push(debrief_block);
 			        new_timeline['timeline'] = multi_store;
 
@@ -362,19 +364,6 @@
                 ' <input id="txtChar" onkeypress="return isNumberKey(event)" type="text" name="star_input">'
                
         };
-
-        //old browse proceduer
-        // var browse = {
-        //     type: 'html-keyboard-response',
-        //     stimulus: function(){
-        //         var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
-        //         html += "<p><img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'review' style='width:450px;height:100px;'/></p>"; 
-        //         html += "<p style = 'font-size: 20pt;'> "+jsPsych.timelineVariable('certainty', true) + "</p>";
-        //         return html;
-        //     },
-        //     choices: jsPsych.NO_KEYS, //think of cover task to require response so they pay attention (two text boxes to type # stars + reveiwers ?)
-        //     trial_duration: 4000
-        // };
 
         var choice_intro = {
         	type: 'html-keyboard-response',
@@ -575,7 +564,7 @@
           type: 'survey-text',
           questions: [{prompt: "In a few words, please describe how you chose which item was best when presented with an offer?"}]
         };
-        timeline.push(post_task_question1);
+
 
         var post_task_question2 = {
         	type: 'survey-likert',
@@ -589,7 +578,7 @@
         	
         	]
         }
-        timeline.push(post_task_question2);
+
         //start experiment 
         jsPsych.init({
             timeline: timeline,
