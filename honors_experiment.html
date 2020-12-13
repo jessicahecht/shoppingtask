@@ -172,8 +172,10 @@
 		                browse_procedure['timeline_variables'] =  all_stores[store_type[i]]
 		                choice_procedure['timeline_variables'] = [all_stores[store_type[i]][0]]
 		                store_procedure['timeline'] = [welcome_procedure, browse_procedure, choice_intro, choice_procedure] 
+
 		                multi_store.push(store_procedure)
 			        }
+                    		multi_store.push(post_shop_instructions);
 			        multi_store.push(post_task_question1);
 			        multi_store.push(post_task_question2);
 			        multi_store.push(debrief_block);
@@ -203,7 +205,7 @@
         var items = [1, 2, 3, 4, 5, 6, 7, 8];
         var low_ratings = [1, 2, 3, 4, 5];
         var high_ratings = [6, 7, 8, 9, 10];
-        var store_type = ['cookie', 'basket', 'bowl', 'cr', 'donut', 'gift', 'ornament', 'sandwich', 'lei', 'goggle'];
+        var store_type = ['cookie']//, 'basket', 'bowl', 'cr', 'donut', 'gift', 'ornament', 'sandwich', 'lei', 'goggle'];
         var trial_number = 0;
         var all_stores = {}; 
 
@@ -422,7 +424,7 @@
                 var list = random_item.split('/')
                 current_store = list[2];
 
-                //get list of ellible items from the given store for the chosen choice type
+                //get list of elligible items from the given store for the chosen choice type
                 var valid_items1 = [];
                 var valid_items2 = [];
                 if (value_types[0] == value_types[1]){
@@ -559,6 +561,14 @@
         1. how did you decide which item was best
         2. how confident are you that you chose the best items
         */
+        var post_shop_instructions = {
+            type: 'html-keyboard-response',
+            stimulus: "<p>You have completed your shopping task for today!</p>" +
+                        "<p> Thank you for completing today's task. </p>" +
+                        "<p> Please answer the next 3 questions and then you will receive your survey code.</p>" +
+                        "<p> Press any key to continue. </p>",
+
+        }
 
         var post_task_question1 = {
           type: 'survey-text',
