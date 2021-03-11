@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Columbia University Psychology Experinent</title>
+        <script src="jspsych-6.1.0/jspsych.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-vsl-grid-scene.js"></script> 
+        <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script> 
+        <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+   		<script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
+        <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    </head>
+    <body style="background-color:lightgrey;">
+    	 
+    </body>
+    <script>
+
+        /* Add subject level parameters to the data */
+        var turkInfo = jsPsych.turk.turkInfo();
+        var code = Math.floor(Math.random()*90000) + 10000;
+        date = + new Date()
+        jsPsych.data.addProperties({
+            subject_id: code, //unique code for each participant
+            date: date, // current date
+        });
+
+        var timeline = [] 
+
+        timeline.push({
+          type: 'fullscreen',
+          fullscreen_mode: true
+        });
+
+        var survey_trial = {
+          type: 'survey-text',
+          questions: [{prompt: "How old are you?"}]
+        };
+        timeline.push(survey_trial);
+
+        var multi_select_block = {
+            type: 'survey-multi-choice',
+            questions: [{prompt: "What is your gender?", options: ["Male","Female","Other"]}]
+        };
+        timeline.push(multi_select_block);
+
+        /* Provide instructions to the participant */
+        var instructions = {
+            type: 'instructions',
+            pages: [
+                "<div><img src='stimuli/instructions_combined/instructions1.png' style='width:960px;height:540px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions2.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions3.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions4.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions5.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions6.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions7.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions8.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions9.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions10.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions11.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions12.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions13.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions14.png' style='width:1000px;height:600px'></img></div>",
+                "<div><img src='stimuli/instructions_combined/instructions15.png' style='width:1000px;height:600px'></img></div>",                
+                "<div><img src='stimuli/instructions_combined/instructions16.png' style='width:1000px;height:600px'></img></div>",                
+                "<div><img src='stimuli/instructions_combined/instructions17.png' style='width:1000px;height:600px'></img></div>",                
+                "<div><img src='stimuli/instructions_combined/instructions18.png' style='width:1000px;height:600px'></img></div>",
+            ],
+            key_forward:'i',
+            key_backward:'u',
+        }
+        timeline.push(instructions);
+
+        /* If they fail the comprehension check, tell them */
+        var repeat_screen = {
+            type: 'instructions',
+            pages: [
+                "Sorry, you missed one or more questions.</br></br>"+
+                "Please press the 'i' key to repeat the instructions."
+            ],
+            key_forward:'i'
+        }
+
+        //adapt based on changes - (typing in stars + reviews etc), fake bonus 
+        var comprehension_check = {
+            type: 'survey-multi-choice',
+            questions: [{prompt: "How many items are there in each store?",
+            			 options: ['4', '8', '16']},
+            			 {prompt: "Offers in this experiment are between:",
+                         options: ['2 items in the same store','2 items in different stores','2 different stores']},
+                        {prompt: "How should you determine which item is best to purchase for your client?",
+                         options: ["If you like it the best","If you like another one the best", "Based on the written review, star review, and number of reviewers"]},
+                        {prompt: "Which key allows you to move on to the next item after the initial 4 seconds?",
+                    	 options: ['p','l','m']},
+                        {prompt: "How many stores will you be visiting today?",
+                         options: ["8","10","12"]},
+                        {prompt: "How many offers will be made for each store?",
+                         options: ["1","5","10"]},
+                        {prompt: "Which key should you use to choose the item offered on the left side?",
+                         options: ["j","k"]},
+                        {prompt: "When purchasing items from the offers, you are allowed to purchase the same item twice.",
+                    	 options: ['true', 'false']},
+                        {prompt: "While browsing, how many times will you be shown each item, or each item's sequence, in a store?",
+                         options: ['1', '2', '3']},
+                        {prompt: "How much time will you have to select an item to purchase from an offer?",
+                     	 options: ['2 seconds', '3 seconds', '4 seconds']}],
+            on_finish: function(data) {
+                var responses = JSON.parse(data.responses);
+                var repeat_instructions = false;
+                if (responses["Q0"] != "8"){
+                	repeat_instructions = true;
+                } else if (responses["Q1"] != "2 items in the same store") {
+                    repeat_instructions = true;
+                } else if (responses["Q2"] != "Based on the written review, star review, and number of reviewers") {
+                    repeat_instructions = true;
+                } else if (responses["Q3"] != "m") {
+                    repeat_instructions = true;
+                } else if (responses["Q4"] != "10") {
+                    repeat_instructions = true;
+                } else if (responses["Q5"] != "5") {
+                    repeat_instructions = true;
+                } else if (responses["Q6"] != "j") {
+                    repeat_instructions = true;
+                } else if (responses["Q7"] != "true"){
+                	repeat_instructions = true;
+                } else if (responses["Q8"] != "2"){
+                	repeat_instructions = true;
+                }  else if (responses["Q9"] != "4 seconds"){
+                	repeat_instructions = true;
+                }
+                if (repeat_instructions) {
+                    var new_timeline = {
+                          timeline: [repeat_screen,
+                                     instructions,
+                                     comprehension_check]
+                    }
+                } else {
+                    var new_timeline = {
+                          timeline: ''
+                    }
+                	var multi_store = []
+    	       		var start = Math.floor(Math.random()*100)
+    	       		var star_store_num = 0 
+    	       		var word_store_num = 0 
+        	        for (let i = 0; i < 10; i++){
+        	        	console.log(start)
+        	        	//AB design
+		                if (start % 2 == 0){
+		        			var welcome_procedure_star = {
+					        timeline: [store_welcome_star, store_type_welcome_star], //add screen saying which store (word or star)
+					        timeline_variables: '',
+					        randomize_order: true,
+					        repetitions: 1 
+					        };
+
+					        var browse_procedure_star = { 
+					        timeline: [fixation, star_stim, star_input, star_review_stim, star_review_input], 
+					        timeline_variables: '', 
+					        randomize_order: true, 
+					        repetitions: 2
+					        };
+
+					        var choice_procedure_star = {
+					        timeline: [fixation, choice_star],
+					        timeline_variables: '',
+					        randomize_order: true,
+					        repetitions: 5 
+					        };
+
+    				        var star_store_procedure = {
+					        timeline: [], 
+					        timeline_variables: trial_stimuli, 
+					        randomize_order: true, 
+					        repetitions: 1  
+					        };
+
+					        welcome_procedure_star['timeline_variables'] = [all_stores_star[store_type_star[star_store_num]][0]]
+			                browse_procedure_star['timeline_variables'] =  all_stores_star[store_type_star[star_store_num]]
+			                choice_procedure_star['timeline_variables'] = [all_stores_star[store_type_star[star_store_num]][0]]
+
+			                star_store_procedure['timeline'] = [welcome_procedure_star, browse_procedure_star, choice_intro, choice_procedure_star] 
+
+			                multi_store.push(star_store_procedure)
+
+			                star_store_num++;
+
+		                } else {
+							var welcome_procedure_word = {
+					        timeline: [store_welcome_word, store_type_welcome_word],
+					        timeline_variables: '',
+					        randomize_order: true,
+					        repetitions: 1 
+					        };
+
+					        var browse_procedure_word = { 
+					        timeline: [fixation, word_review_stim, word_review_stim_respond], 
+					        timeline_variables: '', 
+					        randomize_order: true, 
+					        repetitions: 2
+					        };
+
+					        var choice_procedure_word = {
+					        timeline: [fixation, choice_word],
+					        timeline_variables: '',
+					        randomize_order: true,
+					        repetitions: 5 
+					        };
+
+    				        var word_store_procedure = {
+					        timeline: [], 
+					        timeline_variables: trial_stimuli, 
+					        randomize_order: true, 
+					        repetitions: 1  
+					        };
+
+			                welcome_procedure_word['timeline_variables'] = [all_stores_word[store_type_word[word_store_num]][0]]
+			                browse_procedure_word['timeline_variables'] =  all_stores_word[store_type_word[word_store_num]]
+			                choice_procedure_word['timeline_variables'] = [all_stores_word[store_type_word[word_store_num]][0]]
+
+    		                word_store_procedure['timeline'] = [welcome_procedure_word, browse_procedure_word, choice_intro, choice_procedure_word]
+		
+			                multi_store.push(word_store_procedure)
+
+			                word_store_num++;
+		                }
+		                start++;
+			        }
+                    multi_store.push(post_shop_instructions);
+			        multi_store.push(post_task_question1);
+			        multi_store.push(post_task_question2);
+			        multi_store.push(debrief_block);
+			        new_timeline['timeline'] = multi_store;
+
+                }
+                jsPsych.pauseExperiment();
+                jsPsych.addNodeToEndOfTimeline(new_timeline, jsPsych.resumeExperiment)
+
+            }
+        };
+        timeline.push(comprehension_check);
+        
+        //shuffle function to use later
+        function shuffle(order){
+            var random;
+            var temp;
+            for (var l = order.length - 1; l > 0; l--){
+                random = Math.floor(Math.random() * (l+1));
+                temp = order[l];
+                order[l] = order[random]; 
+                order[random] = temp;    
+            }
+            return order;
+        }
+        var store_type_star = [];
+        var store_type_word = [];
+
+        var stores = ['cookie', 'basket', 'bowl', 'cr', 'donut', 'gift', 'ornament', 'sandwich', 'lei', 'goggle'];
+        stores = shuffle(stores)
+        for (let i = 0; i < 10; i++){
+        	if (i < 5){
+        		store_type_star.push(stores[i])
+        	} else {
+        		store_type_word.push(stores[i])
+        	}
+        }
+
+
+        var items_star = [1, 2, 3, 4, 5, 6, 7, 8];
+        var low_ratings = [1, 2, 3, 4, 5];
+        var high_ratings = [6, 7, 8, 9, 10];
+        var trial_number = 0;
+        var all_stores_star = {}; 
+
+		items_star = shuffle(items_star);
+		low_ratings = shuffle(low_ratings);
+		high_ratings = shuffle(high_ratings);
+		store_type_star = shuffle(store_type_star);
+
+		for (var j = 0; j < store_type_star.length; j++){
+			var store_items = [];
+			var store = store_type_star[j];
+	        for (var i = 0; i < 8; i++) { //i goes to number of items in store
+				var v = '';
+				var c = 'l';
+	            var product = items_star[i];
+                var max = 18;
+        		var min = 2;
+	            if (i > 3){
+	            	max = 108;
+	            	min = 92;
+	            	c = 'h'; 
+	            } 
+	            var rating;
+	            if (i == 0){
+	                rating = low_ratings[0];
+	                v = 'l';
+	            } else if (i % 2 == 0) {
+	                rating = low_ratings[(i/2)];
+	                v = 'l';
+	            } else {
+	                rating = high_ratings[(i+1)/2];
+	                v = 'h'; 
+	            }
+	            var cv = c + v;
+	        	store_items.push(
+	        		{item: "stimuli/choice_items/"+store+"/"+store+product+".png", 
+	        		review: "stimuli/stars/stars"+rating+".png",
+	        		certainty: Math.floor(Math.random() * (max-min+1) + min) + " Reviewers",
+                    type: cv  }); 	        		
+		    }
+		    all_stores_star[store] = store_items; 
+		}
+
+        var items_word = [1, 2, 3, 4, 5, 6, 7, 8];
+        var reviews_word = [1, 2, 3, 4, 5, 6, 7, 8];
+        var all_stores_word = {}; 
+
+		shuffle(items_word);
+		shuffle(reviews_word);
+
+		for (var j = 0; j < store_type_word.length; j++){
+			var store_items = [];
+			var store = store_type_word[j];
+	        for (var i = 0; i < 8; i++) { //i goes to number of items in store
+	            var product = items_word[i];
+	            var rating = reviews_word[i];
+	            var cv = '';
+	            //afinn, vader, concreteness
+	            if (rating == 1 || rating == 2){
+	            	cv = 'hh';
+	            } else if (rating == 3 || rating == 4){
+	            	cv = 'hl';
+	            } else if (rating == 5 || rating == 6){
+	            	cv = 'lh';
+	            } else if (rating == 7 || rating == 8){
+	            	cv = 'll';
+	            }
+	        	store_items.push(
+	        		{item: "stimuli/choice_items/"+store+"/"+store+product+".png", 
+	        		review: "stimuli/word_stimuli/"+store+"/"+store+ 'review' + rating+".png",
+                    type: cv  }); 	        		
+		    }
+		    all_stores_word[store] = store_items; 
+		}
+
+		
+        //valence, certainty _v_ valence, certainty (ll, hl, lh, hh)
+        var stim_list = [   'll_v_ll', 
+                            'lh_v_ll',
+                            'hl_v_ll',
+                            'hh_v_ll',
+                            'lh_v_lh', 
+                            'hl_v_lh',
+                            'hh_v_lh',
+                            'hl_v_hl',
+                            'hl_v_hh',
+                            'hh_v_hh'
+                         ]
+        var stim_tracker = { 
+                            'll_v_ll': 0, //expect chance
+                            'lh_v_ll': 0,
+                            'hl_v_ll': 0,
+                            'hh_v_ll': 0,
+                            'lh_v_lh': 0, //expect chance
+                            'hl_v_lh': 0,
+                            'hh_v_lh': 0,
+                            'hl_v_hl': 0, //expect chance
+                            'hl_v_hh': 0,
+                            'hh_v_hh': 0 //expect chance
+                            }
+
+        var fixation = {
+            type: 'html-keyboard-response',
+            stimulus: '<div style="font-size:60px">+</div>',
+            choices: jsPsych.NO_KEYS, 
+            function (){
+                return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750],1)[0];
+            }
+        };
+
+        /* Initializing a dummy list of stimuli to present
+           JsPsych wants this for some reason  */
+        var trial_stimuli = [{stimulus:"",data:{}}];
+
+        //add image of store to make fun :) 
+        var store_welcome_star = {
+        	type: 'html-keyboard-response',
+        	//change this to be specific for each store
+        	stimulus: function(){
+    		    var random_item = jsPsych.timelineVariable('item', true);
+    		    console.log(jsPsych.timelineVariable('item', true))
+    		    console.log(random_item)
+                var list = random_item.split('/');
+                var current_store = list[2];
+                var welcome_img = "stimuli/store_welcomes/"+current_store+"_intro.png"
+                var html = "<p><img src ='"+welcome_img+"' alt = 'item'></p>"; 
+
+                return html;
+            },
+         	choices: [13]
+        };
+
+        var store_welcome_word = {
+        	type: 'html-keyboard-response',
+        	//change this to be specific for each store
+        	stimulus: function(){
+    		    var random_item = jsPsych.timelineVariable('item', true);
+    		    console.log(jsPsych.timelineVariable('item', true))
+    		    console.log(random_item)
+
+                var list = random_item.split('/');
+                var current_store = list[2];
+                var welcome_img = "stimuli/store_welcomes/"+current_store+"_intro.png"
+                var html = "<p><img src ='"+welcome_img+"' alt = 'item'></p>"; 
+
+                return html;
+            },
+         	choices: [13]
+        };
+
+       var store_type_welcome_star = {
+       		type: 'html-keyboard-response',
+       		stimulus: '<p> This store will be reviewed with star ratings and number reviewers. </p>' +
+       				  '<p> As a reminder, you will be asked to type the star rating and number of reviewers for each item. </p>' +
+       				  "<p> You will see each item's sequence twice. </p>"+
+       				  "<p> Press 'enter' to continue </p>",
+       		choices: [13]		  
+       }
+
+      var store_type_welcome_word = {
+       		type: 'html-keyboard-response',
+       		stimulus: '<p> This store will be reviewed with short written reviews. </p>' +
+       				  "<p> As a reminder, you will be shown a review for 4 seconds, after which you can move on to the next item by pressing the 'm' key. </p>" +
+       				  "<p> You will see each item's sequence twice. </p>" +
+       				  "<p> Press 'enter' to continue </p>",
+       		choices: [13]
+       }
+
+       var star_stim = {
+        	type: 'html-keyboard-response',
+        	stimulus: function(){
+                current_browse_image = jsPsych.timelineVariable('item', true);
+              	var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
+                html += "<p><img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'review' style='width:450px;height:100px;'/></p>"; 
+                return html;
+        	},
+        	choices: jsPsych.NO_KEYS,
+        	trial_duration: 2000
+        }
+
+        var star_input = {
+          type: 'survey-html-form',
+          preamble: function(){
+            var current_browse_image = jsPsych.timelineVariable('item', true);
+            var preamb ="<img src ='"+ current_browse_image + "'style='width:250px;height:250px;' >"
+            return preamb;
+          },
+          html: "<p> What was this item's star rating (e.g. 3, 3.5)? </p>" +
+                ' <input id="txtChar" onkeypress="return isNumberKey(event)" type="text" name="star_input">'               
+        };
+
+        var star_review_stim = {
+        	type: 'html-keyboard-response',
+        	stimulus: function (){
+        		var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
+                html += "<p style = 'font-size: 20pt;'> "+jsPsych.timelineVariable('certainty', true) + "</p>";
+                return html;
+            },
+        	choices: jsPsych.NO_KEYS,
+        	trial_duration: 2000
+        }
+
+        var star_review_input = {
+          type: 'survey-html-form',
+          preamble: function(){
+            var current_browse_image = jsPsych.timelineVariable('item', true);
+            var preamb ="<img src ='"+ current_browse_image + "'style='width:250px;height:250px;' >"
+            return preamb;
+          },
+          html: "<p> How many reviewers contributed to this item's rating? </p>" +
+                ' <input id="txtChar" onkeypress="return isNumberKey(event)" type="text" name="star_input">'             
+        };
+
+        var word_review_stim = {
+        	type: 'html-keyboard-response',
+        	stimulus: function(){
+                current_browse_image = jsPsych.timelineVariable('item', true);
+              	var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
+                html += "<p><img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'review' style='width:450px;height:100px;'/></p>"; 
+                return html;
+        	},
+        	choices: jsPsych.NO_KEYS,
+        	trial_duration: 4000
+        }
+
+        var word_review_stim_respond = {
+        	type: 'html-keyboard-response',
+        	stimulus: function(){
+                current_browse_image = jsPsych.timelineVariable('item', true);
+              	var html = "<p><img src ='"+jsPsych.timelineVariable('item', true)+"' alt = 'item' style='width:250px;height:250px;' ></p>"; 
+                html += "<p><img src ='"+jsPsych.timelineVariable('review', true)+"' alt = 'review' style='width:450px;height:100px;'/></p>"; 
+                return html;
+        	},
+        	choices: ['m'],
+        	trial_duration: 4000 
+        }
+
+
+       function isNumberKey(evt){
+          var charCode = (evt.which) ? evt.which : evt.keyCode;
+          if (charCode != 46 && charCode > 31 
+            && (charCode < 48 || charCode > 57))
+             return false;
+          return true;
+       }
+
+        var choice_intro = {
+        	type: 'html-keyboard-response',
+        	stimulus: "<p>Thank you for browsing our store, now it is time to shop!</p>" +
+        				"<p> To shop, you will be offered  two items that you saw while browsing. It is your job to choose which of the two items to buy. </p>" +
+        				"<p> Select the 'j' key to purchase the item on the left, and the 'k' key to purchase the item on the right.</p>" +
+        				"<p> You will have 4 seconds to choose your item. The store will move on to a new offer if you do not make a choice. </p>" +
+        				"<p> Please make a selection after each offer. </p>" +
+        				"<p> Press enter to begin shopping </p>",
+
+        }
+
+        var choice_star = {
+        	type: 'html-keyboard-response',
+        	stimulus: "",
+            choices: ['j', 'k'],
+            trial_duration: 4000,
+            response_ends_trial: true,
+            data: jsPsych.timelineVariable('data'),
+            on_start: function(choice){
+                trial_number += 1; 
+
+                choice_star.data.phase = 'choice_star';
+                choice_star.data.trial_number = trial_number;
+                choice_star.data.trial_type_num = 'none';
+                choice_star.data.store_type = 'none';
+                choice_star.data.choice_type = 'none';
+                choice_star.data.img_left = 'none';
+                choice_star.data.img_left_rating = 'none';
+                choice_star.data.img_left_certainty = 'none';
+                choice_star.data.img_left_type = 'none'; 
+                choice_star.data.img_right = 'none'; 
+                choice_star.data.img_right_rating = 'none';
+                choice_star.data.img_right_certainty = 'none';
+                choice_star.data.img_right_type = 'none';
+                choice_star.data.chosen = 'none';
+                choice_star.data.choice_rating = 'none';
+                choice_star.data.choice_certainty = 'none';
+                choice_star.data.chosen_type = 'none';
+                choice_star.data.side_chosen = 'none';
+                //choice.data.correct = false;
+
+                //pull from choice type that has not been shown 5 times and sample randomly
+                var valid_stim = [];
+                for (let k = 0; k < stim_list.length; k++){
+                    if (stim_tracker[stim_list[k]] < 5){
+                        valid_stim.push(stim_list[k]);
+                	}
+                }
+
+                var trial_type = shuffle(valid_stim).pop();
+                var value_types = trial_type.split('_v_');
+
+                //get current store
+                var random_item = jsPsych.timelineVariable('item', true);
+                var list = random_item.split('/')
+                current_store = list[2];
+
+                //get list of elligible items from the given store for the chosen choice type
+                var valid_items1 = [];
+                var valid_items2 = [];
+                if (value_types[0] == value_types[1]){
+                	var alternate = false;
+                	for (let k = 0; k < all_stores_star[current_store].length; k++){
+                		if  (alternate == false) {
+                            if(value_types[0] === all_stores_star[current_store][k]['type']){
+                                valid_items1.push(all_stores_star[current_store][k]);
+                                alternate = true;
+                            }
+            			} else {
+                            if(value_types[1] === all_stores_star[current_store][k]['type']){
+                                valid_items2.push(all_stores_star[current_store][k]);
+                                alternate = false;
+                            }
+                		}
+                	}
+                } else {                
+                	for (let k = 0; k < all_stores_star[current_store].length; k++){
+	                    for (let j = 0; j < value_types.length; j++){
+	                        if (j == 0){
+	                            if(value_types[j] === all_stores_star[current_store][k]['type']){
+	                                valid_items1.push(all_stores_star[current_store][k]);
+	                            }
+	                        } else {
+	                        	//if not in validitems1...
+	                            if(value_types[j] === all_stores_star[current_store][k]['type']){
+	                                valid_items2.push(all_stores_star[current_store][k]);
+	                            }
+	                        }
+	                    }                   
+	                }
+	            }
+                
+                var img_left;
+                var img_right;
+                var random_assignment = Math.floor(Math.random() * 10) + 1;
+                if (random_assignment % 2 == 0){
+                    img_left = shuffle(valid_items1).pop();
+                    img_right = shuffle(valid_items2).pop();
+                } else {
+                    img_left = shuffle(valid_items2).pop();
+                    img_right = shuffle(valid_items1).pop();
+                }
+       
+                choice.stimulus = "<div style='width: 1000px;'>"+
+                "<div style='float: left;'><img src='"+img_left['item']+"' style='width:250px;height:250px'></img></div>" +
+                "<div style='float: right;'><img src='"+img_right['item']+"' style='width:250px;height:250px'></img></div>" +
+                "</div>";
+
+                stim_tracker[trial_type] = stim_tracker[trial_type] + 1; 
+
+                //store data
+                var left_list = img_left['item'].split('/');
+                var right_list = img_right['item'].split('/')
+                choice_star.data.phase = 'choice_star';
+                choice_star.data.trial_type_num = stim_tracker[trial_type];
+                choice_star.data.store_type = current_store;
+                choice_star.data.choice_type = trial_type;
+                choice_star.data.img_left = left_list[3].replace('.png', '');
+                choice_star.data.img_left_rating = img_left['review'].replace(/[^0-9]/g, '');
+                choice_star.data.img_left_certainty = img_left['certainty'].replace(/[^0-9]/g, '');
+                choice_star.data.img_left_type = img_left['type'];
+                choice_star.data.img_right = right_list[3].replace('.png', '');
+                choice_star.data.img_right_rating = img_right['review'].replace(/[^0-9]/g, '');
+                choice_star.data.img_right_certainty = img_right['certainty'].replace(/[^0-9]/g, '');
+                choice_star.data.img_right_type = img_right['type'];
+
+
+            },
+            on_finish: function(data) {
+
+                j_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('j');
+                k_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('k');
+
+            //save images, values, uncertainty, (be able to reconstruct trial), rt)
+                if (data.key_press == j_code) {
+                    data.chosen = data.img_left;
+                    data.choice_rating = data.img_left_rating;
+                    data.choice_certainty = data.img_left_certainty;
+                    data.chosen_type = data.img_left_type;
+                    data.side_chosen = 'left'
+                } else if (data.key_press == k_code) {
+                    data.chosen = data.img_right;
+                    data.choice_rating = data.img_right_rating;
+                    data.choice_certainty = data.img_right_certainty;
+                    data.chosen_type = data.img_right_type;
+                    data.side_chosen = 'right'
+                } else {
+                    data.choice = 'no_response';
+                }
+        	}
+        };
+
+        var choice_word = {
+        	type: 'html-keyboard-response',
+        	stimulus: "",
+            choices: ['j', 'k'],
+            trial_duration: 4000,
+            response_ends_trial: true,
+            data: jsPsych.timelineVariable('data'),
+            on_start: function(choice){
+                trial_number += 1; 
+
+                choice_word.data.phase = 'choice_word';
+                choice_word.data.trial_number = trial_number;
+                choice_word.data.trial_type_num = 'none';
+                choice_word.data.store_type = 'none';
+                choice_word.data.choice_type = 'none';
+                choice_word.data.img_left = 'none';
+                choice_word.data.img_left_rating = 'none';
+                choice_word.data.img_left_type = 'none'; 
+                choice_word.data.img_right = 'none'; 
+                choice_word.data.img_right_rating = 'none';
+                choice_word.data.img_right_type = 'none';
+                choice_word.data.chosen = 'none';
+                choice_word.data.choice_rating = 'none';
+                choice_word.data.chosen_type = 'none';
+                choice_word.data.side_chosen = 'none';
+                //choice.data.correct = false;
+
+                //pull from choice type that has not been shown 5 times and sample randomly
+                var valid_stim = [];
+                for (let k = 0; k < stim_list.length; k++){
+                    if (stim_tracker[stim_list[k]] < 5){
+                        valid_stim.push(stim_list[k]);
+                	}
+                }
+
+                var trial_type = shuffle(valid_stim).pop();
+                var value_types = trial_type.split('_v_');
+
+                //get current store
+                var random_item = jsPsych.timelineVariable('item', true);
+                var list = random_item.split('/')
+                current_store = list[2];
+
+                //get list of elligible items from the given store for the chosen choice type
+                var valid_items1 = [];
+                var valid_items2 = [];
+                if (value_types[0] == value_types[1]){
+                	var alternate = false;
+                	for (let k = 0; k < all_stores_word[current_store].length; k++){
+                		if  (alternate == false) {
+                            if(value_types[0] === all_stores_word[current_store][k]['type']){
+                                valid_items1.push(all_stores_word[current_store][k]);
+                                alternate = true;
+                            }
+            			} else {
+                            if(value_types[1] === all_stores_word[current_store][k]['type']){
+                                valid_items2.push(all_stores_word[current_store][k]);
+                                alternate = false;
+                            }
+                		}
+                	}
+                } else {                
+                	for (let k = 0; k < all_stores_word[current_store].length; k++){
+	                    for (let j = 0; j < value_types.length; j++){
+	                        if (j == 0){
+	                            if(value_types[j] === all_stores_word[current_store][k]['type']){
+	                                valid_items1.push(all_stores_word[current_store][k]);
+	                            }
+	                        } else {
+	                        	//if not in validitems1...
+	                            if(value_types[j] === all_stores_word[current_store][k]['type']){
+	                                valid_items2.push(all_stores_word[current_store][k]);
+	                            }
+	                        }
+	                    }                   
+	                }
+	            }
+                
+                var img_left;
+                var img_right;
+                var random_assignment = Math.floor(Math.random() * 10) + 1;
+                if (random_assignment % 2 == 0){
+                    img_left = shuffle(valid_items1).pop();
+                    img_right = shuffle(valid_items2).pop();
+                } else {
+                    img_left = shuffle(valid_items2).pop();
+                    img_right = shuffle(valid_items1).pop();
+                }
+       
+                choice.stimulus = "<div style='width: 1000px;'>"+
+                "<div style='float: left;'><img src='"+img_left['item']+"' style='width:250px;height:250px'></img></div>" +
+                "<div style='float: right;'><img src='"+img_right['item']+"' style='width:250px;height:250px'></img></div>" +
+                "</div>";
+
+                stim_tracker[trial_type] = stim_tracker[trial_type] + 1; 
+
+                //store data
+                var left_list = img_left['item'].split('/');
+                var right_list = img_right['item'].split('/')
+                choice_word.data.phase = 'choice_word';
+                choice_word.data.trial_type_num = stim_tracker[trial_type];
+                choice_word.data.store_type = current_store;
+                choice_word.data.choice_type = trial_type;
+                choice_word.data.img_left = left_list[3].replace('.png', '');
+                choice_word.data.img_left_rating = img_left['review'].replace(/[^0-9]/g, '');
+                choice_word.data.img_left_type = img_left['type'];
+                choice_word.data.img_right = right_list[3].replace('.png', '');
+                choice_word.data.img_right_rating = img_right['review'].replace(/[^0-9]/g, '');
+                choice_word.data.img_right_type = img_right['type'];
+
+
+            },
+            on_finish: function(data) {
+
+                j_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('j');
+                k_code = jsPsych.pluginAPI.convertKeyCharacterToKeyCode('k');
+
+            //save images, values, uncertainty, (be able to reconstruct trial), rt)
+                if (data.key_press == j_code) {
+                    data.chosen = data.img_left;
+                    data.choice_rating = data.img_left_rating;
+                    data.chosen_type = data.img_left_type;
+                    data.side_chosen = 'left'
+                } else if (data.key_press == k_code) {
+                    data.chosen = data.img_right;
+                    data.choice_rating = data.img_right_rating;
+                    data.chosen_type = data.img_right_type;
+                    data.side_chosen = 'right'
+                } else {
+                    data.choice = 'no_response';
+                }
+        	}
+        };
+
+        var debrief_block = {
+            type: "html-keyboard-response",
+            choices: jsPsych.NO_KEYS,
+            stimulus: function() {
+
+		        // This function will locally download data
+		        // Comment out for actual task, uncomment for local testing (without PHP)
+		        function saveData(name, data){
+		           var a         = document.createElement('a');
+		           a.href        = 'data:attachment/csv,' +  encodeURIComponent(data);
+		           a.target      = '_blank';
+		           a.download    = name;
+		           document.body.appendChild(a);
+		           a.click();
+		        }
+		        saveData(code+"_"+date+"_experiment_data.csv", jsPsych.data.get().csv())
+		        saveData(code+"_"+date+"_interaction_data.csv", jsPsych.data.getInteractionData().csv())
+
+                // // Save data
+                // function saveData(name, data){
+                //      var xhr = new XMLHttpRequest();
+                //      xhr.open('POST', 'write_data.php');
+                //      xhr.setRequestHeader('Content-Type', 'application/json');
+                //      xhr.send(JSON.stringify({filename: name, filedata: data}));
+                // }
+
+                // saveData(code+"_"+date+"_"+"bonus"+total_earnings+"_experiment_data.csv", jsPsych.data.get().csv())
+                // saveData(code+"_"+date+"_"+"bonus"+total_earnings+"_interaction_data.csv", jsPsych.data.getInteractionData().csv())
+
+                return "You have completed the experiment. Thank you for participating!"+
+                       "<b>Your survey code is: "+code+"</b>"+
+                       "<p>In order to receive payment, you must provide the above code on the survey link page on mturk.</p>"+
+                       "<p> You may exit fullscreen now.</p>"
+
+            }
+        };
+
+        var post_shop_instructions = {
+            type: 'html-keyboard-response',
+            stimulus: "<p>You have completed your shopping task for today!</p>" +
+                        "<p> Thank you for completing today's task. </p>" +
+                        "<p> Please answer the next 2 questions and then you will receive your survey code.</p>" +
+                        "<p> Press any key to continue. </p>",
+
+        }
+
+        var post_task_question1 = {
+          type: 'survey-text',
+          questions: [{prompt: "In a few words, please describe how you chose which item was best when presented with an offer?"}]
+        };
+
+
+        var post_task_question2 = {
+        	type: 'survey-likert',
+        	questions: [
+        	{prompt: "How confident are you that you consistently chose the best item for your client?", 
+        	labels: ['Not Confident', 'Somewhat Confident', 'Neutral', 'Mostly Confident', 'Very Confident']}
+        	]
+        }
+
+        //start experiment 
+        jsPsych.init({
+            timeline: timeline,
+            minimum_valid_rt: 4000
+        });
+
+
+    </script>
+</html>
