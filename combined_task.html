@@ -377,7 +377,7 @@
             type: 'html-keyboard-response',
             stimulus: '<div style="font-size:60px">+</div>',
             choices: jsPsych.NO_KEYS, 
-            function (){
+            trial_duration: function (){
                 return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750],1)[0];
             }
         };
@@ -536,7 +536,7 @@
             trial_duration: 4000,
             response_ends_trial: true,
             data: jsPsych.timelineVariable('data'),
-            on_start: function(choice){
+            on_start: function(choice_star){
                 trial_number += 1; 
 
                 choice_star.data.phase = 'choice_star';
@@ -621,7 +621,7 @@
                     img_right = shuffle(valid_items1).pop();
                 }
        
-                choice.stimulus = "<div style='width: 1000px;'>"+
+                choice_star.stimulus = "<div style='width: 1000px;'>"+
                 "<div style='float: left;'><img src='"+img_left['item']+"' style='width:250px;height:250px'></img></div>" +
                 "<div style='float: right;'><img src='"+img_right['item']+"' style='width:250px;height:250px'></img></div>" +
                 "</div>";
@@ -677,7 +677,7 @@
             trial_duration: 4000,
             response_ends_trial: true,
             data: jsPsych.timelineVariable('data'),
-            on_start: function(choice){
+            on_start: function(choice_word){
                 trial_number += 1; 
 
                 choice_word.data.phase = 'choice_word';
@@ -759,7 +759,7 @@
                     img_right = shuffle(valid_items1).pop();
                 }
        
-                choice.stimulus = "<div style='width: 1000px;'>"+
+                choice_word.stimulus = "<div style='width: 1000px;'>"+
                 "<div style='float: left;'><img src='"+img_left['item']+"' style='width:250px;height:250px'></img></div>" +
                 "<div style='float: right;'><img src='"+img_right['item']+"' style='width:250px;height:250px'></img></div>" +
                 "</div>";
